@@ -9,11 +9,14 @@ import dalleRoutes from './routes/dalleRoutes.js';
 dotenv.config();
 
 const app = express();
+
+// ✅ Updated CORS to allow all origins (or you can add your Render frontend URL)
 app.use(cors({
-  origin: '*', // You can replace '*' with your frontend URL in production
+  origin: 'https://image-generation-rxy8.onrender.com', // or replace '*' with your actual frontend URL from Render if you want to restrict it
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
+  credentials: false,
 }));
+
 app.use(express.json({ limit: '50mb' }));
 
 app.use('/api/v1/post', postRoutes);
