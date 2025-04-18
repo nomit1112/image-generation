@@ -10,9 +10,9 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Updated CORS to allow all origins (or you can add your Render frontend URL)
+// ✅ CORS fix - allow frontend URL or '*' for testing
 app.use(cors({
-  origin: 'https://image-generation-rxy8.onrender.com', // or replace '*' with your actual frontend URL from Render if you want to restrict it
+  origin: '*', // For now allow all. Later replace with your frontend link like 'https://your-frontend.onrender.com'
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: false,
 }));

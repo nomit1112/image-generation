@@ -39,9 +39,12 @@ const CreatePost = () => {
         });
 
         const data = await response.json();
-        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
+
+        // ✅ If Replicate returns direct image URL
+        setForm({ ...form, photo: data.photo });
       } catch (err) {
-        alert(err);
+        alert('Error generating image');
+        console.error(err);
       } finally {
         setGeneratingImg(false);
       }
@@ -81,7 +84,7 @@ const CreatePost = () => {
     <section className="max-w-7xl mx-auto">
       <div>
         <h1 className="font-extrabold text-[#222328] text-[32px]">Create</h1>
-        <p className="mt-2 text-[#666e75] text-[14px] max-w-[500px]">Generate an imaginative image through DALL-E AI and share it with the community</p>
+        <p className="mt-2 text-[#666e75] text-[14px] max-w-[500px]">Generate an imaginative image through Replicate AI and share it with the community</p>
       </div>
 
       <form className="mt-16 max-w-3xl" onSubmit={handleSubmit}>
@@ -107,7 +110,7 @@ const CreatePost = () => {
           />
 
           <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center">
-            { form.photo ? (
+            {form.photo ? (
               <img
                 src={form.photo}
                 alt={form.prompt}
@@ -133,7 +136,7 @@ const CreatePost = () => {
           <button
             type="button"
             onClick={generateImage}
-            className=" text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+            className="text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {generatingImg ? 'Generating...' : 'Generate'}
           </button>
