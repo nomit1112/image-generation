@@ -1,35 +1,40 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-import { OpenAI } from 'openai';
+import Replicate from 'replicate';
 
 dotenv.config();
 
 const router = express.Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// Initialize Replicate
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
 });
 
+// Routes
 router.route('/').get((req, res) => {
-  res.status(200).json({ message: 'Hello from DALL-E!' });
+  res.status(200).json({ message: 'Hello from Replicate!' });
 });
 
 router.route('/').post(async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    const aiResponse = await openai.images.generate({
-      model: 'dall-e-2', // or "dall-e-3" if you have access
-      prompt,
-      n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json',
-    });
+    const output = await replicate.run(
+      "black-forest-labs/flux-1.1-pro",
+      {
+        input: {
+          prompt: prompt
+        }
+      }
+    );
 
-    const image = aiResponse.data[0].b64_json;
-    res.status(200).json({ photo: image });
+    // `output` will be a URL of the generated image
+    const imageUrl = Array.isArray(output) ? output[0] : output;
+res.status(200).json({ photo: imageUrl });
+
   } catch (error) {
-    console.error('OpenAI Error:', error);
+    console.error('Replicate Error:', error);
     res.status(500).send(error?.message || 'Something went wrong');
   }
 });
