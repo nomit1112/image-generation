@@ -7,6 +7,8 @@ import postRoutes from './routes/postRoutes.js';
 import dalleRoutes from './routes/dalleRoutes.js';
 
 dotenv.config();
+// Add this line for debugging on Render
+console.log("SERVER STARTING - Replicate Token:", process.env.REPLICATE_API_TOKEN ? "Loaded" : "MISSING OR UNDEFINED");
 
 const app = express();
 app.use(cors());
