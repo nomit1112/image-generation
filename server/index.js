@@ -6,39 +6,31 @@ import connectDB from './mongodb/connect.js';
 import postRoutes from './routes/postRoutes.js';
 import dalleRoutes from './routes/dalleRoutes.js';
 
-dotenv.config(); // Load environment variables from .env file
-
-// Optional: Log to confirm Replicate API token loaded
-console.log("🔁 Replicate API Token:", process.env.REPLICATE_API_TOKEN ? 'Token loaded ✅' : '❌ Token missing!');
+dotenv.config();
 
 const app = express();
-app.use(cors()); // Enable CORS
-app.use(express.json({ limit: '50mb' })); // Parse JSON request bodies, limit to 50mb
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
 
-// Use the defined routes
 app.use('/api/v1/post', postRoutes);
 app.use('/api/v1/dalle', dalleRoutes);
 
-// Basic root route
+// A simple root route to confirm the server is running
 app.get('/', async (req, res) => {
-  res.send('Hello from AI Image Generator Backend using Replicate!');
+  res.status(200).json({
+    message: 'Hello from DALL.E!',
+  });
 });
 
-// Function to start the server
 const startServer = async () => {
   try {
-    // Connect to MongoDB
-    await connectDB(process.env.MONGODB_URL);
-    console.log("🟢 Connected to MongoDB");
-
-    // Start the Express server
-    app.listen(8080, () =>
-      console.log('🚀 Server started on http://localhost:8080')
-    );
+    // --- FIX: Using your original environment variable name ---
+    connectDB(process.env.MONGODB_URL); 
+    const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
   } catch (error) {
-    // Log any errors during server startup (DB connection, etc.)
-    console.error('❌ Failed to start server:', error);
+    console.log(error);
   }
 };
 
-startServer(); // Call the function to start the server
+startServer();

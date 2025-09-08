@@ -11,7 +11,7 @@ const CreatePost = () => {
   const [form, setForm] = useState({
     name: '',
     prompt: '',
-    photo: '', // This will store the image URL string
+    photo: '',
   });
 
   const [generatingImg, setGeneratingImg] = useState(false);
@@ -28,8 +28,8 @@ const CreatePost = () => {
     if (form.prompt) {
       try {
         setGeneratingImg(true);
-        // Make the API call to your backend's /api/v1/dalle route
-        const response = await fetch('http://localhost:8080/api/v1/dalle', {
+        // --- CHANGE: Use environment variable for API URL ---
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/dalle`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,31 +39,20 @@ const CreatePost = () => {
           }),
         });
 
-        // Parse the JSON response from the backend
         const data = await response.json();
-
-        // Check if the response contains the 'photo' property (the image URL)
-        if (response.ok && data.photo) { // Check response.ok for success status codes
-          // Update the form state with the received image URL
+        if (response.ok && data.photo) {
           setForm({ ...form, photo: data.photo });
-          console.log('Image URL received and state updated:', data.photo); // Add a log here
-
         } else {
-          // Handle errors if backend response is not ok or no photo URL is received
           console.error('Image generation backend error:', data.message || 'Unknown error');
           alert(data.message || 'Image generation failed. Please try again.');
         }
-
       } catch (err) {
-        // Handle network errors or other exceptions
         console.error('Error while generating image:', err);
         alert('Something went wrong while generating the image.');
       } finally {
-        // Always set generatingImg to false after the process
         setGeneratingImg(false);
       }
     } else {
-      // Alert if prompt is empty
       alert('Please provide a proper prompt');
     }
   };
@@ -74,38 +63,32 @@ const CreatePost = () => {
     if (form.prompt && form.photo) {
       setLoading(true);
       try {
-        // Make the API call to your backend's /api/v1/post route to share the post
-        const response = await fetch('http://localhost:8080/api/v1/post', {
+        // --- CHANGE: Use environment variable for API URL ---
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/post`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ ...form }), // Send the form data including the image URL
+          body: JSON.stringify({ ...form }),
         });
 
-        // Check if the response is successful
         if (response.ok) {
-          await response.json(); // Parse response if needed, or just check status
+          await response.json();
           alert('Success');
-          navigate('/'); // Navigate to the homepage after successful submission
+          navigate('/');
         } else {
-          // Handle errors if backend response is not ok
-           console.error('Post submission backend error:', response.status); // Log status
-           const errorData = await response.json(); // Try to get error message from body
-           console.error('Post submission backend error data:', errorData);
-           alert(errorData.message || 'Something went wrong while sharing the image.');
+          console.error('Post submission backend error:', response.status);
+          const errorData = await response.json();
+          console.error('Post submission backend error data:', errorData);
+          alert(errorData.message || 'Something went wrong while sharing the image.');
         }
-
       } catch (err) {
-        // Handle network errors or other exceptions during submission
         console.error('Error while submitting post:', err);
         alert('Something went wrong while sharing the image.');
       } finally {
-        // Always set loading to false
         setLoading(false);
       }
     } else {
-      // Alert if image is not generated or prompt/name is missing before sharing
       alert('Please generate an image with proper details');
     }
   };
@@ -121,7 +104,6 @@ const CreatePost = () => {
 
       <form className="mt-16 max-w-3xl" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-5">
-          {/* FormField for Name */}
           <FormField
             labelName="Your Name"
             type="text"
@@ -131,7 +113,6 @@ const CreatePost = () => {
             handleChange={handleChange}
           />
 
-          {/* FormField for Prompt */}
           <FormField
             labelName="Prompt"
             type="text"
@@ -143,24 +124,21 @@ const CreatePost = () => {
             handleSurpriseMe={handleSurpriseMe}
           />
 
-          {/* Image Preview Area */}
           <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center">
-            {/* Corrected Conditional Rendering using Ternary Operator */}
-            {form.photo ? ( // If form.photo has a value (the image URL)
+            {form.photo ? (
               <img
-                src={form.photo} // Use the generated image URL
+                src={form.photo}
                 alt={form.prompt}
                 className="w-full h-full object-contain"
               />
-            ) : ( // Otherwise (if form.photo is empty)
+            ) : (
               <img
-                src={preview} // Use the placeholder preview image
+                src={preview}
                 alt="preview"
                 className="w-9/12 h-9/12 object-contain opacity-40"
               />
             )}
 
-            {/* Loader Overlay */}
             {generatingImg && (
               <div className="absolute inset-0 z-0 flex justify-center items-center bg-[rgba(0,0,0,0.5)] rounded-lg">
                 <Loader />
@@ -169,7 +147,6 @@ const CreatePost = () => {
           </div>
         </div>
 
-        {/* Generate Button */}
         <div className="mt-5 flex gap-5">
           <button
             type="button"
@@ -180,7 +157,6 @@ const CreatePost = () => {
           </button>
         </div>
 
-        {/* Share with the Community Section and Button */}
         <div className="mt-10">
           <p className="mt-2 text-[#666e75] text-[14px]">
             ** Once you have created the image you want, you can share it with others in the community **
