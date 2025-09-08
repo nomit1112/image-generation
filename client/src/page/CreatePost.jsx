@@ -26,6 +26,8 @@ const CreatePost = () => {
 
   const generateImage = async () => {
     if (form.prompt) {
+      console.log('Attempting to call API at:', import.meta.env.VITE_API_URL);
+
       try {
         setGeneratingImg(true);
         // --- CHANGE: Use environment variable for API URL ---
