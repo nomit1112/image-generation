@@ -8,34 +8,40 @@ import dalleRoutes from './routes/dalleRoutes.js';
 
 dotenv.config();
 
-// Debugging log to confirm environment variables
 console.log("SERVER STARTING - Replicate Token:", process.env.REPLICATE_API_TOKEN ? "Loaded" : "MISSING OR UNDEFINED");
 
 const app = express();
 
-// ✅ Allow only your frontend Render domain
+// ✅ Allow both localhost (dev) and your Render frontend (prod)
+const allowedOrigins = [
+  "http://localhost:5173",               // for local React dev
+  "https://nomit-ai-app.onrender.com"   // 🔑 replace with your actual frontend Render URL
+];
+
 app.use(cors({
-  origin: "https://nomit-ai-app.onrender.com",  // 🔑 replace with your actual frontend Render URL
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS blocked: " + origin));
+    }
+  },
   credentials: true
 }));
 
-// Middleware
 app.use(express.json({ limit: '50mb' }));
 
 // Routes
 app.use('/api/v1/post', postRoutes);
 app.use('/api/v1/dalle', dalleRoutes);
 
-// Simple health check route
+// Health check
 app.get('/', async (req, res) => {
-  res.status(200).json({
-    message: 'Hello from DALL·E backend!',
-  });
+  res.status(200).json({ message: 'Hello from DALL·E backend!' });
 });
 
 const startServer = async () => {
   try {
-    // Connect to MongoDB
     await connectDB(process.env.MONGODB_URL);
     console.log("🟢 Connected to MongoDB");
 
@@ -47,3 +53,4 @@ const startServer = async () => {
 };
 
 startServer();
+
