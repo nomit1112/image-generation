@@ -5,6 +5,9 @@ import { preview } from '../assets';
 import { getRandomPrompt } from '../utils';
 import { FormField, Loader } from '../components';
 
+// --- FINAL: Defines the API URL for both local and production environments ---
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const CreatePost = () => {
   const navigate = useNavigate();
 
@@ -26,12 +29,12 @@ const CreatePost = () => {
 
   const generateImage = async () => {
     if (form.prompt) {
-      console.log('Attempting to call API at:', import.meta.env.VITE_API_URL);
+      // DEBUG LOG: This helps confirm the correct URL is being used.
+      console.log('Attempting to call API at:', API_URL);
 
       try {
         setGeneratingImg(true);
-        // --- CHANGE: Use environment variable for API URL ---
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/dalle`, {
+        const response = await fetch(`${API_URL}/api/v1/dalle`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -45,9 +48,9 @@ const CreatePost = () => {
         if (response.ok && data.photo) {
           setForm({ ...form, photo: data.photo });
         } else {
-          console.error('Image generation backend error:', data.message || 'Unknown error');
           alert(data.message || 'Image generation failed. Please try again.');
         }
+
       } catch (err) {
         console.error('Error while generating image:', err);
         alert('Something went wrong while generating the image.');
@@ -65,8 +68,7 @@ const CreatePost = () => {
     if (form.prompt && form.photo) {
       setLoading(true);
       try {
-        // --- CHANGE: Use environment variable for API URL ---
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/post`, {
+        const response = await fetch(`${API_URL}/api/v1/post`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -79,11 +81,10 @@ const CreatePost = () => {
           alert('Success');
           navigate('/');
         } else {
-          console.error('Post submission backend error:', response.status);
           const errorData = await response.json();
-          console.error('Post submission backend error data:', errorData);
           alert(errorData.message || 'Something went wrong while sharing the image.');
         }
+
       } catch (err) {
         console.error('Error while submitting post:', err);
         alert('Something went wrong while sharing the image.');
@@ -98,7 +99,8 @@ const CreatePost = () => {
   return (
     <section className="max-w-7xl mx-auto">
       <div>
-        <h1 className="font-extrabold text-[#222328] text-[32px]">Create</h1>
+        {/* --- VISIBLE CHANGE: This new title helps confirm you have the latest code --- */}
+        <h1 className="font-extrabold text-[#222328] text-[32px]">Create a New Image</h1>
         <p className="mt-2 text-[#666e75] text-[14px] max-w-[500px]">
           Generate an imaginative image through AI and share it with the community
         </p>
