@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 import { Card, FormField, Loader } from '../components';
 
+// --- FINAL: Defines the API URL for both local and production environments ---
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const RenderCards = ({ data, title }) => {
   if (data?.length > 0) {
     return (
@@ -26,7 +29,8 @@ const Home = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/post', {
+      // CHANGE: Use the API_URL constant ---
+      const response = await fetch(`${API_URL}/api/v1/post`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
